@@ -21,12 +21,13 @@ _testmain.go
 
 *.exe
 dependencies-stamp
-/snmp_exporter
+/inspec_exporter
 /.build
 /.release
 /.tarballs
 /.idea
 .deps
 *.tar.gz
+vendor/
 
 generator/generator

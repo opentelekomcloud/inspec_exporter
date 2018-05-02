@@ -1,5 +1,5 @@
 repository:
-    path: github.com/prometheus/snmp_exporter
+    path: gitlab.tsi-dev.otc-service.com/tsi-automation/inspec-exporter
 build:
     flags: -a -tags netgo
     ldflags: |
@@ -10,9 +10,9 @@ build:
         -X {{repoPath}}/vendor/github.com/prometheus/common/version.BuildDate={{date "20060102-15:04:05"}}
 tarball:
     files:
-        - snmp.yml
+        - inspec.yml
         - LICENSE
-        - NOTICE
+        #- NOTICE
 crossbuild:
     platforms:
         - linux/amd64

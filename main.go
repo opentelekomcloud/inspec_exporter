@@ -4,26 +4,22 @@ import (
 	"fmt"
 	"net/http"
 	_ "net/http/pprof"
-	"os"
-	"os/signal"
-	"sync"
-	"syscall"
 	"time"
 
 	"gopkg.in/alecthomas/kingpin.v2"
-	yaml "gopkg.in/yaml.v2"
 
+	"github.com/fsnotify/fsnotify"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/common/log"
 	"github.com/prometheus/common/version"
-
-	"inspec_exporter/config"
+	"github.com/spf13/viper"
+	"os/exec"
 )
 
 var (
-	configFile    = kingpin.Flag("config.file", "Path to configuration file.").Default("inspec.yml").String()
-	listenAddress = kingpin.Flag("web.listen-address", "Address to listen on for web interface and telemetry.").Default(":9116").String()
+	configFile    = kingpin.Flag("config.file", "Path to configuration file.").Default("inspec").String()
+	listenAddress = kingpin.Flag("web.listen-address", "Address to listen on for web interface and telemetry.").Default(":9124").String()
 
 	// Metrics about the inspec exporter itself.
 	inspecDuration = prometheus.NewSummaryVec(
@@ -39,10 +35,6 @@ var (
 			Help: "Errors in requests to the inspec exporter",
 		},
 	)
-	sc = &SafeConfig{
-		C: &config.Config{},
-	}
-	reloadCh chan chan error
 )
 
 func init() {
@@ -59,13 +51,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	moduleName := r.URL.Query().Get("module")
-	if moduleName == "" {
-		moduleName = "if_mib"
-	}
-	sc.RLock()
-	module, ok := (*(sc.C))[moduleName]
-	sc.RUnlock()
-	if !ok {
+	module := viper.GetStringMap(moduleName)
+	if module == nil {
 		http.Error(w, fmt.Sprintf("Unkown module '%s'", moduleName), 400)
 		inspecRequestErrors.Inc()
 		return
@@ -74,7 +61,16 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 	start := time.Now()
 	registry := prometheus.NewRegistry()
-	collector := collector{target: target, module: module}
+
+	m := Module{
+		path:            viper.GetString(fmt.Sprintf("%v.path", moduleName)),
+		needSudo:        viper.GetBool(fmt.Sprintf("%v.need_sudo", moduleName)),
+		prefix:          viper.GetString(fmt.Sprintf("%v.prefix", moduleName)),
+		sshIdentityFile: viper.GetString(fmt.Sprintf("%v.ssh_identity_file", moduleName)),
+		sshPort:         viper.GetInt(fmt.Sprintf("%v.ssh_port", moduleName)),
+		sshUser:         viper.GetString(fmt.Sprintf("%v.ssh_user", moduleName)),
+	}
+	collector := collector{target: target, module: &m}
 	registry.MustRegister(collector)
 	// Delegate http serving to Promethues client library, which will call collector.Collect.
 	h := promhttp.HandlerFor(registry, promhttp.HandlerOpts{})
@@ -82,38 +78,6 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	duration := float64(time.Since(start).Seconds())
 	inspecDuration.WithLabelValues(moduleName).Observe(duration)
 	log.Debugf("Scrape of target '%s' with module '%s' took %f seconds", target, moduleName, duration)
-}
-
-func updateConfiguration(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case "POST":
-		rc := make(chan error)
-		reloadCh <- rc
-		if err := <-rc; err != nil {
-			http.Error(w, fmt.Sprintf("failed to reload config: %s", err), http.StatusInternalServerError)
-		}
-	default:
-		log.Errorf("POST method expected")
-		http.Error(w, "POST method expected", 400)
-	}
-}
-
-type SafeConfig struct {
-	sync.RWMutex
-	C *config.Config
-}
-
-func (sc *SafeConfig) ReloadConfig(configFile string) (err error) {
-	conf, err := config.LoadFile(configFile)
-	if err != nil {
-		log.Errorf("Error parsing config file: %s", err)
-		return err
-	}
-	sc.Lock()
-	sc.C = conf
-	sc.Unlock()
-	log.Infoln("Loaded config file")
-	return nil
 }
 
 func main() {
@@ -125,41 +89,25 @@ func main() {
 	log.Infoln("Starting inspec exporter", version.Info())
 	log.Infoln("Build context", version.BuildContext())
 
-	// Bail early if the config is bad.
-	var err error
-	sc.C, err = config.LoadFile(*configFile)
-	if err != nil {
-		log.Fatalf("Error parsing config file: %s", err)
+	viper.AddConfigPath(".")
+	viper.SetConfigName(*configFile)              // name of config file (without extension)
+	viper.AddConfigPath("/etc/inspec_exporter/")  // path to look for the config file in
+	viper.AddConfigPath("$HOME/.inspec_exporter") // call multiple times to add many search paths
+	err := viper.ReadInConfig()                   // Find and read the config file
+	if err != nil {                               // Handle errors reading the config file
+		panic(fmt.Errorf("Fatal error config file: %s \n", err))
 	}
-	// Initilise metrics.
-	for module, _ := range *sc.C {
-		inspecDuration.WithLabelValues(module)
+	_, inspecLookErr := exec.LookPath(viper.GetString("inspec_path"))
+	if inspecLookErr != nil {
+		panic(inspecLookErr)
 	}
+	viper.WatchConfig()
+	viper.OnConfigChange(func(e fsnotify.Event) {
+		fmt.Println("Config file changed:", e.Name)
+	})
 
-	hup := make(chan os.Signal)
-	reloadCh = make(chan chan error)
-	signal.Notify(hup, syscall.SIGHUP)
-	go func() {
-		for {
-			select {
-			case <-hup:
-				if err := sc.ReloadConfig(*configFile); err != nil {
-					log.Errorf("Error reloading config: %s", err)
-				}
-			case rc := <-reloadCh:
-				if err := sc.ReloadConfig(*configFile); err != nil {
-					log.Errorf("Error reloading config: %s", err)
-					rc <- err
-				} else {
-					rc <- nil
-				}
-			}
-		}
-	}()
-
-	http.Handle("/metrics", promhttp.Handler())       // Normal metrics endpoint for inspec exporter itself.
-	http.HandleFunc("/inspec", handler)                 // Endpoint to do inspec scrapes.
-	http.HandleFunc("/-/reload", updateConfiguration) // Endpoint to reload configuration.
+	http.Handle("/metrics", promhttp.Handler()) // Normal metrics endpoint for inspec exporter itself.
+	http.HandleFunc("/inspec", handler)         // Endpoint to do inspec scrapes.
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`<html>
@@ -179,27 +127,15 @@ func main() {
             </style>
             </head>
             <body>
-            <h1>inspec Exporter</h1>
-            <form action="/inspec">
-            <label>Target:</label> <input type="text" name="target" placeholder="X.X.X.X" value="1.2.3.4"><br>
-            <label>Module:</label> <input type="text" name="module" placeholder="module" value="if_mib"><br>
-            <input type="submit" value="Submit">
-            </form>
-						<p><a href="/config">Config</a></p>
+            	<h1>inspec Exporter</h1>
+            	<form action="/inspec">
+            		<label>Target:</label> <input type="text" name="target" placeholder="X.X.X.X" value="1.2.3.4"><br>
+            		<label>Module:</label> <input type="text" name="module" placeholder="module" value="sudoers"><br>
+            		<input type="submit" value="Submit">
+            	</form>
+				<p><a href="/metrics">Metrics</a></p>
             </body>
             </html>`))
-	})
-
-	http.HandleFunc("/config", func(w http.ResponseWriter, r *http.Request) {
-		sc.RLock()
-		c, err := yaml.Marshal(sc.C)
-		sc.RUnlock()
-		if err != nil {
-			log.Warnf("Error marshalling configuration: %v", err)
-			http.Error(w, err.Error(), 500)
-			return
-		}
-		w.Write(c)
 	})
 
 	log.Infof("Listening on %s", *listenAddress)

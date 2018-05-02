@@ -18,15 +18,15 @@
 
 [[projects]]
   branch = "master"
-  name = "github.com/alouca/gologger"
-  packages = ["."]
-  revision = "7d4b7291de9c9df1b3fe6a3d784b3675b6c0c996"
-
-[[projects]]
-  branch = "master"
   name = "github.com/beorn7/perks"
   packages = ["quantile"]
   revision = "3a771d992973f24aa725d07868b467d1ddfceafb"
+
+[[projects]]
+  name = "github.com/fsnotify/fsnotify"
+  packages = ["."]
+  revision = "c2828203cd70a50dcccfb2761f8b1f8ceef9a8e9"
+  version = "v1.4.7"
 
 [[projects]]
   name = "github.com/golang/protobuf"
@@ -35,10 +35,51 @@
   version = "v1.0.0"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/hashicorp/hcl"
+  packages = [
+    ".",
+    "hcl/ast",
+    "hcl/parser",
+    "hcl/printer",
+    "hcl/scanner",
+    "hcl/strconv",
+    "hcl/token",
+    "json/parser",
+    "json/scanner",
+    "json/token"
+  ]
+  revision = "ef8a98b0bbce4a65b5aa4c368430a80ddc533168"
+
+[[projects]]
+  name = "github.com/kennygrant/sanitize"
+  packages = ["."]
+  revision = "2e6820834a1f36c626bf19a253b7d3cc060e9b8b"
+  version = "v1.2.3"
+
+[[projects]]
+  name = "github.com/magiconair/properties"
+  packages = ["."]
+  revision = "c3beff4c2358b44d0493c7dda585e7db7ff28ae6"
+  version = "v1.7.6"
+
+[[projects]]
   name = "github.com/matttproud/golang_protobuf_extensions"
   packages = ["pbutil"]
   revision = "3247c84500bff8d9fb6d579d800f20b3e091582c"
   version = "v1.0.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/mitchellh/mapstructure"
+  packages = ["."]
+  revision = "00c29f56e2386353d58c599509e8dc3801b0d716"
+
+[[projects]]
+  name = "github.com/pelletier/go-toml"
+  packages = ["."]
+  revision = "acdc4509485b587f5e675510c4f2c63e90ff68a8"
+  version = "v1.1.0"
 
 [[projects]]
   name = "github.com/prometheus/client_golang"
@@ -85,16 +126,52 @@
   version = "v1.0.5"
 
 [[projects]]
-  name = "github.com/soniah/gosnmp"
+  name = "github.com/spf13/afero"
+  packages = [
+    ".",
+    "mem"
+  ]
+  revision = "63644898a8da0bc22138abf860edaf5277b6102e"
+  version = "v1.1.0"
+
+[[projects]]
+  name = "github.com/spf13/cast"
   packages = ["."]
-  revision = "ecdd943d00fe0e34ea021e893b295a9ff6af0434"
-  version = "v1.0"
+  revision = "8965335b8c7107321228e3e3702cab9832751bac"
+  version = "v1.2.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/spf13/jwalterweatherman"
+  packages = ["."]
+  revision = "7c0cea34c8ece3fbeb2b27ab9b59511d360fb394"
+
+[[projects]]
+  name = "github.com/spf13/pflag"
+  packages = ["."]
+  revision = "583c0c0531f06d5278b7d917446061adc344b5cd"
+  version = "v1.0.1"
+
+[[projects]]
+  name = "github.com/spf13/viper"
+  packages = ["."]
+  revision = "b5e8006cbee93ec955a89ab31e0e3ce3204f3736"
+  version = "v1.0.2"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
   revision = "d6449816ce06963d9d136eee5a56fca5b0616e7e"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/net"
+  packages = [
+    "html",
+    "html/atom"
+  ]
+  revision = "500e7a4f953ddaf55d316b4d3adc516aa0379622"
 
 [[projects]]
   branch = "master"
@@ -106,6 +183,19 @@
     "windows/svc/eventlog"
   ]
   revision = "2281fa97ef7b0c26324634d5a22f04babdac8713"
+
+[[projects]]
+  name = "golang.org/x/text"
+  packages = [
+    "internal/gen",
+    "internal/triegen",
+    "internal/ucd",
+    "transform",
+    "unicode/cldr",
+    "unicode/norm"
+  ]
+  revision = "f21a4dfb5e38f5895301dc265a8def02365cc3d0"
+  version = "v0.3.0"
 
 [[projects]]
   name = "gopkg.in/alecthomas/kingpin.v2"
@@ -122,6 +212,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "be9eae294bcdab2198d8862c0fc869195766d0adddca5c2ec25a8e46ac13d465"
+  inputs-digest = "5588964c835f6e9bb980d7f33c4d03ba949c6c880459099cdacbc3456a39e8c0"
   solver-name = "gps-cdcl"
   solver-version = 1

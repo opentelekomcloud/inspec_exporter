@@ -1,0 +1,8 @@
+inspec_path: '/usr/local/bin/inspec'
+sudoers:
+  ssh_user: 'root'
+  ssh_identity_file: '/Users/sveres/.ssh/id_rsa_sveres'
+  ssh_port: 22
+  need_sudo: true
+  path: /Users/sveres/Development/tsi/inspec/sudoers
+  prefix: 'inspec_sudoers'
