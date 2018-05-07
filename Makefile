@@ -1,4 +1,3 @@
-SHELL         = /bin/bash
 GO           := GO15VENDOREXPERIMENT=1 go
 FIRST_GOPATH := $(firstword $(subst :, ,$(shell $(GO) env GOPATH)))
 PROMU        := $(FIRST_GOPATH)/bin/promu
@@ -10,15 +9,11 @@ DOCKER_IMAGE_NAME       ?= inspec-exporter
 DOCKER_IMAGE_TAG        ?= $(subst /,-,$(shell git rev-parse --abbrev-ref HEAD))
 
 
-all: format build test
+all: format build docker
 
 style:
 	@echo ">> checking code style"
 	@! gofmt -d $(shell find . -path ./vendor -prune -o -name '*.go' -print) | grep '^'
-
-test:
-	@echo ">> running tests"
-	@$(GO) test -short $(pkgs)
 
 format:
 	@echo ">> formatting code"
@@ -45,4 +40,5 @@ promu:
 	        GOARCH=$(subst x86_64,amd64,$(patsubst i%86,386,$(shell uname -m))) \
 	        $(GO) get -u github.com/prometheus/promu
 
-.PHONY: all style format build test vet tarball docker promu
+
+.PHONY: all style format build vet tarball docker promu

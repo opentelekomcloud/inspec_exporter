@@ -1,5 +1,5 @@
 repository:
-    path: gitlab.tsi-dev.otc-service.com/tsi-automation/inspec-exporter
+    path: gitlab.tsi-dev.otc-service.com/tsi-automation/inspec_exporter
 build:
     flags: -a -tags netgo
     ldflags: |

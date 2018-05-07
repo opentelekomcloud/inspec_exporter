@@ -6,4 +6,4 @@ COPY inspec.yml       /etc/inspec_exporter/inspec.yml
 
 EXPOSE      9124
 ENTRYPOINT  [ "/bin/inspec_exporter" ]
-CMD [ "--config.file=/etc/inspec_exporter/inspec.yml" ]
+CMD         [ "--config.file=/etc/inspec_exporter/inspec.yml" ]
