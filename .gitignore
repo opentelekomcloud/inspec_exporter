@@ -29,5 +29,6 @@ dependencies-stamp
 .deps
 *.tar.gz
 vendor/
+inspec.yml
 
 generator/generator
