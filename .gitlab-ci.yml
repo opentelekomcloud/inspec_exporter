@@ -18,39 +18,33 @@ before_script:
   - ln -s /go/src/gitlab.com/pantomath-io /go/src/_/builds/pantomath-io
   - make dep
 
-unit_tests:
-  stage: test
-  script:
-    - make test
+#unit_tests:
+#  stage: test
+#  script:
+#    - make test
 
-race_detector:
-  stage: test
-  script:
-    - make race
 
-memory_sanitizer:
+style:
   stage: test
   script:
-    - make msan
-
-code_coverage:
+    - make style
+    
+format:
   stage: test
   script:
-    - make coverage
-
-code_coverage_report:
+    - make format
+    
+vet:
   stage: test
   script:
-    - make coverhtml
-  only:
-  - master
-
-lint_code:
-  stage: test
-  script:
-    - make lint
+    - make vet
 
 build:
   stage: build
   script:
-    - make
+    - make build
+
+docker:
+  stage: build
+  script:
+    - make docker
