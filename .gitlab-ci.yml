@@ -12,11 +12,11 @@ stages:
   - test
   - build
 
-before_script:
-  - mkdir -p /go/src/gitlab.com/tsi-automation /go/src/_/builds
-  - cp -r $CI_PROJECT_DIR /go/src/gitlab.com/tsi-automation/inspec_exporter
-  - ln -s /go/src/gitlab.com/tsi-automation /go/src/_/builds/tsi-automation
-  - make dep
+#before_script:
+#  - mkdir -p /go/src/gitlab.com/tsi-automation /go/src/_/builds
+#  - cp -r $CI_PROJECT_DIR /go/src/gitlab.com/tsi-automation/inspec_exporter
+#  - ln -s /go/src/gitlab.com/tsi-automation /go/src/_/builds/tsi-automation
+#  - make dep
 
 #unit_tests:
 #  stage: test
