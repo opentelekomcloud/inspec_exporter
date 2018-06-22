@@ -13,9 +13,9 @@ stages:
   - build
 
 before_script:
-  - mkdir -p /go/src/gitlab.com/pantomath-io /go/src/_/builds
-  - cp -r $CI_PROJECT_DIR /go/src/gitlab.com/pantomath-io/pantomath
-  - ln -s /go/src/gitlab.com/pantomath-io /go/src/_/builds/pantomath-io
+  - mkdir -p /go/src/gitlab.com/tsi-automation /go/src/_/builds
+  - cp -r $CI_PROJECT_DIR /go/src/gitlab.com/tsi-automation/inspec_exporter
+  - ln -s /go/src/gitlab.com/tsi-automation /go/src/_/builds/tsi-automation
   - make dep
 
 #unit_tests:
