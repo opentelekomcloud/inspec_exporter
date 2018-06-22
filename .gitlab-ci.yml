@@ -1,4 +1,4 @@
-image: golang:alpine
+image: golang:10.1
 
 cache:
   paths:
@@ -13,7 +13,7 @@ stages:
   - build
 
 before_script:
-  - apt install golang
+  - sudo apt install golang
   - export GOROOT="/usr/lib/go"
   - export GOPATH="/gopath"
   - export GOBIN="/gopath/bin"
