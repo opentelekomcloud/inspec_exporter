@@ -13,7 +13,7 @@ stages:
   - build
 
 before_script:
-  - sudo apt install golang
+  - sudo -S apt install golang
   - export GOROOT="/usr/lib/go"
   - export GOPATH="/gopath"
   - export GOBIN="/gopath/bin"
