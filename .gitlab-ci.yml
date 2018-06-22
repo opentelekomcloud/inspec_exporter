@@ -13,23 +13,17 @@ stages:
   - build
 
 before_script:
-  - apk update && apk add curl golang && rm -rf /var/cache/apk/*
+  - apt install golang
   - export GOROOT="/usr/lib/go"
   - export GOPATH="/gopath"
   - export GOBIN="/gopath/bin"
   - export PATH="$PATH:$GOROOT/bin:$GOPATH/bin"
-  - sudo apt update && sudo apt install golang
-  - go get -u github.com/golang/dep/cmd/dep 
-  - export GOPATH=$(dirname $CI_PROJECT_DIR)/go
+  - go get -u github.com/golang/dep/cmd/dep
   - mkdir -p $GOPATH/src
   - cd $GOPATH/src
   - ln -s $CI_PROJECT_DIR
   - cd $CI_PROJECT_NAME
-  - dep ensure -update
-#  - mkdir -p /go/src/gitlab.com/tsi-automation /go/src/_/builds
-#  - cp -r $CI_PROJECT_DIR /go/src/gitlab.com/tsi-automation/inspec_exporter
-#  - ln -s /go/src/gitlab.com/tsi-automation /go/src/_/builds/tsi-automation
-#  - make dep
+  - dep ensure
 
 #unit_tests:
 #  stage: test
