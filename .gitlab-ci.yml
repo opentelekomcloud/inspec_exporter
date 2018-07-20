@@ -1,4 +1,5 @@
-image: golang:latest
+services:
+  - golang:latest
 
 cache:
   paths:
