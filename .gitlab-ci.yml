@@ -15,8 +15,8 @@ stages:
   - release
 
 variables:
-  CONTAINER_TEST_IMAGE: docker.tsi-dev.otc-service.com/tsi-automation/inspec_exporter:$CI_BUILD_REF_NAME
-  CONTAINER_RELEASE_IMAGE: docker.tsi-dev.otc-service.com/tsi-automation/inspec_exporter:latest
+  CONTAINER_TEST_IMAGE: gitlab.tsi-dev.otc-services.com/tsi-automation/inspec_exporter:$CI_BUILD_REF_NAME
+  CONTAINER_RELEASE_IMAGE: gitlab.tsi-dev.otc-services.com/tsi-automation/inspec_exporter:latest
 
 before_script:
   - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN docker.tsi-dev.otc-service.com
