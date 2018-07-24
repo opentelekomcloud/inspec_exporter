@@ -1,4 +1,4 @@
-image: golang:latest
+image: docker.tsi-dev.otc-service.com/tsi-automation/inspec_exporter:latest
 
 cache:
   paths:
@@ -9,60 +9,52 @@ cache:
     - /go/src/gopkg.in
 
 stages:
-  - build
   - test
-  - release
-
-variables:
-  CONTAINER_TEST_IMAGE: docker.tsi-dev.otc-service.com/tsi-automation/inspec_exporter:$CI_BUILD_REF_NAME
-  CONTAINER_RELEASE_IMAGE: docker.tsi-dev.otc-service.com/tsi-automation/inspec_exporter:latest
+  - build
 
 before_script:
-  - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN docker.tsi-dev.otc-service.com
-#  - sudo -S apt install golang
-#  - export GOROOT="/usr/lib/go"
-#  - export GOPATH="/gopath"
-#  - export GOBIN="/gopath/bin"
-#  - export PATH="$PATH:$GOROOT/bin:$GOPATH/bin"
-  - go get -u github.com/golang/dep/cmd/dep
-  - mkdir -p $GOPATH/src
-  - cd $GOPATH/src
-  - ln -s $CI_PROJECT_DIR
-  - cd $CI_PROJECT_NAME
-  - dep ensure
+  - mkdir -p /go/src/docker.tsi-dev.otc-service.com/tsi-automation /go/src/_/builds
+  - cp -r $CI_PROJECT_DIR /go/src/docker.tsi-dev.otc-service.com/tsi-automation/inspec_exporter
+  - ln -s /go/src/docker.tsi-dev.otc-service.com/tsi-automation /go/src/_/builds/tsi-automation
+  - export CC=clang-5.0
+  - make dep
 
-style:
-  stage: build
-  script:
-    - make style
-    
-format:
-  stage: build
-  script:
-    - make format
-    
-vet:
-  stage: build
-  script:
-    - make vet
-
-build:
-  stage: build
-  script:
-    - make build
-    - docker build -t $CONTAINER_TEST_IMAGE .
-    - docker push $CONTAINER_TEST_IMAGE
-
-#test:
+#unit_tests:
 #  stage: test
 #  script:
 #    - make test
 
-release-image:
-  stage: release
+#race_detector:
+#  stage: test
+#  script:
+#    - make race
+
+#memory_sanitizer:
+#  stage: test
+#  script:
+#    - make msan
+
+#code_coverage:
+#  stage: test
+#  script:
+#    - make coverage
+
+#code_coverage_report:
+#  stage: test
+#  script:
+#    - make coverhtml
+#  only:
+#  - master
+
+#lint_code:
+#  stage: test
+#  script:
+#    - make lint
+
+build:
+  stage: build
   script:
-    - docker pull $CONTAINER_TEST_IMAGE
-    - docker tag $CONTAINER_TEST_IMAGE $CONTAINER_RELEASE_IMAGE
-    - docker push $CONTAINER_RELEASE_IMAGE
-  only:
-    - master
+    - make
+  artifacts:
+    paths:
+    - inspec_exporter
