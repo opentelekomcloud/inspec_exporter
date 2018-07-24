@@ -1,8 +1,11 @@
-inspec_path: '/usr/local/bin/inspec'
+inspec_path: 'inspec'
+profile_path: '/etc/inspec_exporter/profiles'
+# only use this direct config if you want to override the defaults
+# all values must be set at this moment
 sudoers:
-  ssh_user: 'root'
-  ssh_identity_file: '/Users/sveres/.ssh/id_rsa_sveres'
-  ssh_port: 22
+  ssh_user: ''  # use '' if you want to use local connection
+  ssh_identity_file: ''
+  ssh_port: 0 # use 0 if you want to use local connection
   need_sudo: true
-  path: /Users/sveres/Development/tsi/inspec/sudoers
-  prefix: 'inspec_sudoers'
+  path: /etc/inspec_exporter/profiles/sudoers
+  prefix: 'sudoers'

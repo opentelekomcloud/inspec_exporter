@@ -47,12 +47,15 @@ func ScrapeTarget(target string, config *Module) (InspecOutput, error) {
 	inspecArgs := []string{
 		"exec",
 		config.path,
-		"-t",
-		fmt.Sprintf("ssh://%v@%v:%v", config.sshUser, target, config.sshPort),
-		"-i",
-		config.sshIdentityFile,
 		"--reporter",
 		"json-min",
+	}
+	if target != "" {
+		inspecArgs = append(inspecArgs,
+			"-t",
+			fmt.Sprintf("ssh://%v@%v:%v", config.sshUser, target, config.sshPort),
+			"-i",
+			config.sshIdentityFile)
 	}
 	if config.needSudo {
 		inspecArgs = append(inspecArgs, "--sudo")

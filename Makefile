@@ -1,15 +1,16 @@
 GO           := GO15VENDOREXPERIMENT=1 go
 FIRST_GOPATH := $(firstword $(subst :, ,$(shell $(GO) env GOPATH)))
 PROMU        := $(FIRST_GOPATH)/bin/promu
+DEP          := $(FIRST_GOPATH)/bin/dep
 pkgs          = $(shell $(GO) list ./... | grep -v /vendor/)
 
 PREFIX                  ?= $(shell pwd)
 BIN_DIR                 ?= $(shell pwd)
-DOCKER_IMAGE_NAME       ?= inspec-exporter
+DOCKER_IMAGE_NAME       ?= inspec_exporter
 DOCKER_IMAGE_TAG        ?= $(subst /,-,$(shell git rev-parse --abbrev-ref HEAD))
 
 
-all: format build docker
+all: format ensure build docker
 
 style:
 	@echo ">> checking code style"
@@ -19,11 +20,11 @@ format:
 	@echo ">> formatting code"
 	@$(GO) fmt $(pkgs)
 
-vet:
-	@echo ">> vetting code"
-	@$(GO) vet $(pkgs)
+ensure: dep
+	@echo ">> ensure deps"
+	@$(DEP) ensure
 
-build: promu
+build: dep promu
 	@echo ">> building binaries"
 	@$(PROMU) build --prefix $(PREFIX)
 
@@ -37,8 +38,12 @@ docker:
 
 promu:
 	@GOOS=$(shell uname -s | tr A-Z a-z) \
-	        GOARCH=$(subst x86_64,amd64,$(patsubst i%86,386,$(shell uname -m))) \
-	        $(GO) get -u github.com/prometheus/promu
+	GOARCH=$(subst x86_64,amd64,$(patsubst i%86,386,$(shell uname -m))) \
+	$(GO) get -u github.com/prometheus/promu
 
+dep:
+	@GOOS=$(shell uname -s | tr A-Z a-z) \
+	GOARCH=$(subst x86_64,amd64,$(patsubst i%86,386,$(shell uname -m))) \
+	$(GO) get -u github.com/golang/dep/cmd/dep
 
-.PHONY: all style format build vet tarball docker promu
+.PHONY: all style format build tarball docker promu dep

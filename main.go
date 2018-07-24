@@ -14,6 +14,8 @@ import (
 	"github.com/prometheus/common/log"
 	"github.com/prometheus/common/version"
 	"github.com/spf13/viper"
+	"io/ioutil"
+	"os"
 	"os/exec"
 )
 
@@ -45,39 +47,91 @@ func init() {
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	target := r.URL.Query().Get("target")
-	if target == "" {
-		http.Error(w, "'target' parameter must be specified", 400)
+	module := r.URL.Query().Get("module")
+
+	global_path := viper.GetString("profile_path")
+	if _, err := os.Stat(global_path); os.IsNotExist(err) {
+		// path/to/whatever does not exist
+		http.Error(w, "'profile_path' in config is empty or does not exists", 500)
 		inspecRequestErrors.Inc()
 		return
 	}
-	moduleName := r.URL.Query().Get("module")
-	module := viper.GetStringMap(moduleName)
-	if module == nil {
-		http.Error(w, fmt.Sprintf("Unkown module '%s'", moduleName), 400)
-		inspecRequestErrors.Inc()
-		return
-	}
-	log.Debugf("Scraping target '%s' with module '%s'", target, moduleName)
 
 	start := time.Now()
 	registry := prometheus.NewRegistry()
 
-	m := Module{
-		path:            viper.GetString(fmt.Sprintf("%v.path", moduleName)),
-		needSudo:        viper.GetBool(fmt.Sprintf("%v.need_sudo", moduleName)),
-		prefix:          viper.GetString(fmt.Sprintf("%v.prefix", moduleName)),
-		sshIdentityFile: viper.GetString(fmt.Sprintf("%v.ssh_identity_file", moduleName)),
-		sshPort:         viper.GetInt(fmt.Sprintf("%v.ssh_port", moduleName)),
-		sshUser:         viper.GetString(fmt.Sprintf("%v.ssh_user", moduleName)),
+	m := Module{}
+	if module != "" {
+		if _, err := os.Stat(global_path + "/" + module); os.IsNotExist(err) {
+			http.Error(w, fmt.Sprintf("Unkown module '%s'", module), 400)
+			inspecRequestErrors.Inc()
+			return
+		}
+
+		//TODO: use defaults
+		if viper.GetStringMap(module) == nil {
+			m = Module{
+				path:            global_path + "/" + module,
+				needSudo:        false,
+				prefix:          module,
+				sshIdentityFile: "",
+				sshPort:         0,
+				sshUser:         "",
+			}
+		} else {
+			m = Module{
+				path:            viper.GetString(fmt.Sprintf("%v.path", module)),
+				needSudo:        viper.GetBool(fmt.Sprintf("%v.need_sudo", module)),
+				prefix:          viper.GetString(fmt.Sprintf("%v.prefix", module)),
+				sshIdentityFile: viper.GetString(fmt.Sprintf("%v.ssh_identity_file", module)),
+				sshPort:         viper.GetInt(fmt.Sprintf("%v.ssh_port", module)),
+				sshUser:         viper.GetString(fmt.Sprintf("%v.ssh_user", module)),
+			}
+		}
+		collector := collector{target: target, module: &m}
+		registry.MustRegister(collector)
+	} else {
+		profiles, err := ioutil.ReadDir("./")
+		if err != nil {
+			http.Error(w, "'profile_path' is not readable", 500)
+			inspecRequestErrors.Inc()
+			return
+		}
+
+		for _, profile := range profiles {
+
+			//TODO: use defaults
+			if viper.GetStringMap(profile.Name()) == nil {
+				m = Module{
+					path:            global_path + "/" + profile.Name(),
+					needSudo:        false,
+					prefix:          profile.Name(),
+					sshIdentityFile: "",
+					sshPort:         0,
+					sshUser:         "",
+				}
+			} else {
+
+				m = Module{
+					path:            viper.GetString(fmt.Sprintf("%v.path", profile.Name())),
+					needSudo:        viper.GetBool(fmt.Sprintf("%v.need_sudo", profile.Name())),
+					prefix:          viper.GetString(fmt.Sprintf("%v.prefix", profile.Name())),
+					sshIdentityFile: viper.GetString(fmt.Sprintf("%v.ssh_identity_file", profile.Name())),
+					sshPort:         viper.GetInt(fmt.Sprintf("%v.ssh_port", profile.Name())),
+					sshUser:         viper.GetString(fmt.Sprintf("%v.ssh_user", profile.Name())),
+				}
+			}
+			collector := collector{target: target, module: &m}
+			registry.MustRegister(collector)
+		}
 	}
-	collector := collector{target: target, module: &m}
-	registry.MustRegister(collector)
+
 	// Delegate http serving to Promethues client library, which will call collector.Collect.
 	h := promhttp.HandlerFor(registry, promhttp.HandlerOpts{})
 	h.ServeHTTP(w, r)
 	duration := float64(time.Since(start).Seconds())
-	inspecDuration.WithLabelValues(moduleName).Observe(duration)
-	log.Debugf("Scrape of target '%s' with module '%s' took %f seconds", target, moduleName, duration)
+	inspecDuration.WithLabelValues(module).Observe(duration)
+	log.Debugf("Scrape of target '%s' with module '%s' took %f seconds", target, module, duration)
 }
 
 func main() {
