@@ -1,5 +1,4 @@
-image: 
-    name: "golang:latest"
+image: golang:latest
 
 cache:
   paths:
