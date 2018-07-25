@@ -1,5 +1,5 @@
 image: 
-    name: "hub.docker.com/golang:latest"
+    name: "golang:latest"
 
 cache:
   paths:
