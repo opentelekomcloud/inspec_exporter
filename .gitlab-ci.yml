@@ -1,4 +1,5 @@
-image: golang:1.10
+image: 
+    name: "hub.docker.com/golang:latest"
 
 cache:
   paths:
