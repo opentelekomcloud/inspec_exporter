@@ -22,8 +22,8 @@ variables:
 
 before_script:
 #  - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN docker.tsi-dev.otc-service.com
-  - mkdir -p $GOPATH/src
-  - cd $GOPATH/src
+  - mkdir -p $GOPATH/src/gitlab.tsi-dev.otc-service.com
+  - cd $GOPATH/src/gitlab.tsi-dev.otc-service.com
   - ln -s $CI_PROJECT_DIR
   - cd $CI_PROJECT_NAME
 
