@@ -1,7 +1,4 @@
-image: golang:alpine
-
-services:
-  - docker:dind
+image: golang:latest
 
 cache:
   paths:
@@ -21,10 +18,10 @@ variables:
   CONTAINER_RELEASE_IMAGE: docker.tsi-dev.otc-service.com/tsi-automation/inspec_exporter:latest
 
 before_script:
-  - apk update
-  - apk add docker
+#  - apk update
+#  - apk add docker
 #  - service docker start
-  - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN docker.tsi-dev.otc-service.com
+#  - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN docker.tsi-dev.otc-service.com
 #  - sudo -S apt install golang
 #  - export GOROOT="/usr/lib/go"
 #  - export GOPATH="/gopath"
@@ -56,19 +53,22 @@ build:
   stage: build
   script:
     - make build
-    - docker build -t $CONTAINER_TEST_IMAGE .
-    - docker push $CONTAINER_TEST_IMAGE
-
+#    - docker build -t $CONTAINER_TEST_IMAGE .
+#    - docker push $CONTAINER_TEST_IMAGE
+  artifacts:
+    paths:
+    - inspec_exporter
+    expire_in: 1 week
 #test:
 #  stage: test
 #  script:
 #    - make test
 
-release-image:
-  stage: release
-  script:
-    - docker pull $CONTAINER_TEST_IMAGE
-    - docker tag $CONTAINER_TEST_IMAGE $CONTAINER_RELEASE_IMAGE
-    - docker push $CONTAINER_RELEASE_IMAGE
-  only:
-    - master
+#release-image:
+#  stage: release
+#  script:
+#    - docker pull $CONTAINER_TEST_IMAGE
+#    - docker tag $CONTAINER_TEST_IMAGE $CONTAINER_RELEASE_IMAGE
+#    - docker push $CONTAINER_RELEASE_IMAGE
+#  only:
+#    - master
