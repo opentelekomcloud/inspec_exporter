@@ -18,7 +18,7 @@ variables:
   CONTAINER_RELEASE_IMAGE: docker.tsi-dev.otc-service.com/tsi-automation/inspec_exporter:latest
 
 before_script:
-  - apk install docker
+  - apk add docker
   - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN docker.tsi-dev.otc-service.com
 #  - sudo -S apt install golang
 #  - export GOROOT="/usr/lib/go"
