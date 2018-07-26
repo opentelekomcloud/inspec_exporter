@@ -15,6 +15,8 @@ stages:
   - release
 
 variables:
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_DRIVER: overlay2
   CONTAINER_TEST_IMAGE: docker.tsi-dev.otc-service.com/tsi-automation/inspec_exporter:$CI_BUILD_REF_NAME
   CONTAINER_RELEASE_IMAGE: docker.tsi-dev.otc-service.com/tsi-automation/inspec_exporter:latest
 
@@ -42,6 +44,7 @@ format:
 build:
   stage: build
   script:
+    - pwd
     - make build
 
 release-image:
