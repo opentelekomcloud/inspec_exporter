@@ -26,6 +26,7 @@ before_script:
   - cd $GOPATH/src/gitlab.tsi-dev.otc-service.com
   - ln -s $CI_PROJECT_DIR
   - cd $CI_PROJECT_NAME
+  - pwd
 
 #test:
 #  stage: test
