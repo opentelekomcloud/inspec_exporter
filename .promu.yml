@@ -1,7 +1,9 @@
 repository:
     path: gitlab.tsi-dev.otc-service.com/tsi-automation/inspec_exporter
 build:
-    flags: -a -tags netgo
+    binaries:
+        - name: inspec_exporter
+    flags: -a -tags 'netgo static_build'
     ldflags: |
         -X {{repoPath}}/vendor/github.com/prometheus/common/version.Version={{.Version}}
         -X {{repoPath}}/vendor/github.com/prometheus/common/version.Revision={{.Revision}}

@@ -10,7 +10,7 @@ DOCKER_IMAGE_NAME       ?= inspec_exporter
 DOCKER_IMAGE_TAG        ?= $(subst /,-,$(shell git rev-parse --abbrev-ref HEAD))
 
 
-all: format ensure build docker
+all: format build docker
 
 style:
 	@echo ">> checking code style"
@@ -20,17 +20,17 @@ format:
 	@echo ">> formatting code"
 	@$(GO) fmt $(pkgs)
 
-ensure: dep
-	@echo ">> ensure deps"
-	@$(DEP) ensure
-
 build: dep promu
 	@echo ">> building binaries"
+	@$(DEP) ensure
 	@$(PROMU) build --prefix $(PREFIX)
 
-tarball: promu
-	@echo ">> building release tarball"
-	@$(PROMU) tarball --prefix $(PREFIX) $(BIN_DIR)
+crossbuild: promu
+	@echo ">> crossbuild binaries"
+	@$(PROMU) crossbuild
+	@$(PROMU) corssbuild tarball --prefix $(PREFIX) $(BIN_DIR)
+	@$(PROMU) corssbuild checksums .tarballs
+	@$(PROMU) corssbuild release .tarballs
 
 docker:
 	@echo ">> building docker image"
@@ -46,4 +46,4 @@ dep:
 	GOARCH=$(subst x86_64,amd64,$(patsubst i%86,386,$(shell uname -m))) \
 	$(GO) get -u github.com/golang/dep/cmd/dep
 
-.PHONY: all style format build tarball docker promu dep
+.PHONY: all style format build crossbuild docker promu dep
