@@ -5,11 +5,10 @@ image: golang:latest
 
 cache:
   paths:
-    - /apt-cache
-    - /go/src/github.com
-    - /go/src/golang.org
-    - /go/src/google.golang.org
-    - /go/src/gopkg.in
+    - $GOPATH/src/github.com
+    - $GOPATH/src/golang.org
+    - $GOPATH/src/google.golang.org
+    - $GOPATH/src/gopkg.in
 
 stages:
   - build
@@ -48,10 +47,6 @@ build:
     - make build
 #    - docker build -t $CONTAINER_TEST_IMAGE .
 #    - docker push $CONTAINER_TEST_IMAGE
-  artifacts:
-    paths:
-    - inspec_exporter
-    expire_in: 1 week
 
 release-image:
   image: docker:latest
