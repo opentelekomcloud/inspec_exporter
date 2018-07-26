@@ -1,4 +1,4 @@
-image: golang:latest
+image: golang:alpine:latest
 
 cache:
   paths:
@@ -18,10 +18,7 @@ variables:
   CONTAINER_RELEASE_IMAGE: docker.tsi-dev.otc-service.com/tsi-automation/inspec_exporter:latest
 
 before_script:
-  - apt-get update && apt-get install -y apt-transport-https ca-certificates curl gnupg2 software-properties-common
-  - curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
-  - add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
-  - apt-get update && apt-get install -y docker-ce
+  - apk install docker
   - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN docker.tsi-dev.otc-service.com
 #  - sudo -S apt install golang
 #  - export GOROOT="/usr/lib/go"
