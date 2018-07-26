@@ -19,6 +19,7 @@ variables:
 
 before_script:
   - apk add docker
+  - service docker start
   - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN docker.tsi-dev.otc-service.com
 #  - sudo -S apt install golang
 #  - export GOROOT="/usr/lib/go"
