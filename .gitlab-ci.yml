@@ -1,14 +1,13 @@
 image: golang:latest
 
-
-
-
 cache:
+  key: ${CI_COMMIT_REF_SLUG}
   paths:
     - $GOPATH/src/github.com
     - $GOPATH/src/golang.org
     - $GOPATH/src/google.golang.org
     - $GOPATH/src/gopkg.in
+    - inspec_exporter
 
 stages:
   - build
@@ -20,7 +19,6 @@ variables:
   CONTAINER_RELEASE_IMAGE: docker.tsi-dev.otc-service.com/tsi-automation/inspec_exporter:latest
 
 before_script:
-#  - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN docker.tsi-dev.otc-service.com
   - mkdir -p $GOPATH/src/gitlab.tsi-dev.otc-service.com/tsi-automation
   - cd $GOPATH/src/gitlab.tsi-dev.otc-service.com/tsi-automation
   - ln -s $CI_PROJECT_DIR
@@ -45,8 +43,6 @@ build:
   stage: build
   script:
     - make build
-#    - docker build -t $CONTAINER_TEST_IMAGE .
-#    - docker push $CONTAINER_TEST_IMAGE
 
 release-image:
   image: docker:latest
@@ -54,6 +50,8 @@ release-image:
     - docker:dind
   stage: release
   script:
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN docker.tsi-dev.otc-service.com
+    - make docker
     - docker pull $CONTAINER_TEST_IMAGE
     - docker tag $CONTAINER_TEST_IMAGE $CONTAINER_RELEASE_IMAGE
     - docker push $CONTAINER_RELEASE_IMAGE
