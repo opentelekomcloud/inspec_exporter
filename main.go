@@ -73,7 +73,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			m = Module{
 				path:            global_path + "/" + module,
 				needSudo:        false,
-				prefix:          module,
+				prefix:          "inspec_"+module,
 				sshIdentityFile: "",
 				sshPort:         0,
 				sshUser:         "",
@@ -82,7 +82,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			m = Module{
 				path:            viper.GetString(fmt.Sprintf("%v.path", module)),
 				needSudo:        viper.GetBool(fmt.Sprintf("%v.need_sudo", module)),
-				prefix:          viper.GetString(fmt.Sprintf("%v.prefix", module)),
+				prefix:          "inspec_"+viper.GetString(fmt.Sprintf("%v.prefix", module)),
 				sshIdentityFile: viper.GetString(fmt.Sprintf("%v.ssh_identity_file", module)),
 				sshPort:         viper.GetInt(fmt.Sprintf("%v.ssh_port", module)),
 				sshUser:         viper.GetString(fmt.Sprintf("%v.ssh_user", module)),
