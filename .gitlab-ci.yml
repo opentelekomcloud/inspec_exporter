@@ -3,10 +3,9 @@ image: golang:latest
 cache:
   key: ${CI_COMMIT_REF_SLUG}
   paths:
-    - /go/src/github.com
-    - /go/src/golang.org
-    - /go/src/google.golang.org
-    - /go/src/gopkg.in
+    - /go/src/gitlab.tsi-dev.otc-service.com/tsi-automation/inspec_exporter/vendor/github.com
+    - /go/src/gitlab.tsi-dev.otc-service.com/tsi-automation/inspec_exporter/vendor/golang.org
+    - /go/src/gitlab.tsi-dev.otc-service.com/tsi-automation/inspec_exporter/vendor/gopkg.in
     - inspec_exporter
 
 stages:
