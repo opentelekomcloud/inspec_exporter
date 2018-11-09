@@ -1,0 +1,19 @@
+dist: trusty
+sudo: required
+language: go
+
+go:
+- 1.11.x
+
+services:
+- docker
+
+go_import_path: github.com/OpenTelekomCloud/inspec_exporter
+
+before_script:
+- docker --version
+- docker-compose --version
+
+script:
+- make all
+- make crossbuild
