@@ -1,5 +1,7 @@
 # Inspec exporter
 
+[![Build Status](https://travis-ci.org/OpenTelekomCloud/inspec_exporter.svg?branch=master)](https://travis-ci.org/OpenTelekomCloud/inspec_exporter)
+
 Inspec exporter for complaince metrics, written
 in Go with pluggable metric collectors. Its possible to gather results local or remote over ssh.
 
