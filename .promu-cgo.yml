@@ -19,14 +19,15 @@ tarball:
         - LICENSE-MIT
 crossbuild:
     platforms:
-        - linux/amd64
-        - linux/386
-        - linux/arm
-        - linux/arm64
-        - linux/mips
-        - linux/mipsle
-        - linux/mips64
-        - linux/mips64le
-        - linux/ppc64
-        - linux/ppc64le
-        - linux/s390x
+        - darwin/amd64
+        - darwin/386
+        - windows/amd64
+        - windows/386
+        - freebsd/amd64
+        - freebsd/386
+        - openbsd/amd64
+        - openbsd/386
+        - netbsd/amd64
+        - netbsd/386
+        - dragonfly/amd64
+        - netbsd/arm
