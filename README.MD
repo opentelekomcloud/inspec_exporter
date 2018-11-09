@@ -12,8 +12,8 @@ Prerequisites:
 
 Building:
 
-    go get gitlab.tsi-dev.otc-service.com/tsi-automation/inspec_exporter
-    cd ${GOPATH-$HOME/go}/src/gitlab.tsi-dev.otc-service.com/tsi-automation/inspec_exporter
+    go get github.com/OpenTelekomCloud/inspec_exporter
+    cd $GOPATH/src/github.com/OpenTelekomCloud/inspec_exporter
     make
     ./inspec_exporter <flags>
 
