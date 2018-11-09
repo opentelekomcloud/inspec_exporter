@@ -28,6 +28,7 @@ dependencies-stamp
 /.idea
 .deps
 *.tar.gz
+.DS_Store
 vendor/
 inspec.yml
 

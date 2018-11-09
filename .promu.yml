@@ -1,5 +1,5 @@
 repository:
-    path: gitlab.tsi-dev.otc-service.com/tsi-automation/inspec_exporter
+    path: github.com/OpenTelekomCloud/inspec_exporter
 build:
     binaries:
         - name: inspec_exporter
@@ -13,8 +13,8 @@ build:
 tarball:
     files:
         - inspec.yml
-        - LICENSE
-        #- NOTICE
+        - LICENSE-APACHE
+        - LICENSE-MIT
 crossbuild:
     platforms:
         - linux/amd64
@@ -32,12 +32,6 @@ crossbuild:
         - dragonfly/amd64
         - linux/arm
         - linux/arm64
-        # Temporarily deactivated as golang.org/x/sys does not have syscalls
-        # implemented for that os/platform combination.
-        #- freebsd/arm
-        #- openbsd/arm
-        #- linux/mips64
-        #- linux/mips64le
         - netbsd/arm
         - linux/ppc64
         - linux/ppc64le

@@ -2,10 +2,10 @@ inspec_path: 'inspec'
 profile_path: '/etc/inspec_exporter/profiles'
 # only use this direct config if you want to override the defaults
 # all values must be set at this moment
-sudoers:
+linux_baseline:
   ssh_user: ''  # use '' if you want to use local connection
   ssh_identity_file: ''
   ssh_port: 0 # use 0 if you want to use local connection
   need_sudo: true
-  path: /etc/inspec_exporter/profiles/sudoers
-  prefix: 'sudoers'
+  path: /etc/inspec_exporter/profiles/linux_baseline
+  prefix: 'linux_baseline'
