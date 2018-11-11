@@ -98,14 +98,14 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 		return
 	}
 	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc(c.module.prefix+"total_returned", "Tests returned from scrape process.", nil, nil),
+		prometheus.NewDesc(c.module.prefix+"total_returned", "Total number of inspec tests returned from scrape process.", nil, nil),
 		prometheus.GaugeValue,
 		float64(len(inspecData.Controls)))
 
 	passed := 0
 	for _, check := range inspecData.Controls {
 		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc(c.module.prefix+normalize(check.CodeDesc), check.CodeDesc, nil, nil),
+			prometheus.NewDesc(c.module.prefix+normalize(check.CodeDesc), normalize(check.CodeDesc), nil, nil),
 			prometheus.GaugeValue,
 			isPassed(check.Status))
 		if isPassed(check.Status) > 0 {
@@ -114,7 +114,7 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 	}
 
 	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc(c.module.prefix+"total_passed", "Tests returned from scrape process.", nil, nil),
+		prometheus.NewDesc(c.module.prefix+"total_passed", " Total number of passed inspec tests returned from scrape process.", nil, nil),
 		prometheus.GaugeValue,
 		float64(passed))
 
