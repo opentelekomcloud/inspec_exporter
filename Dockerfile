@@ -1,5 +1,5 @@
-FROM        ruby:alpine
-MAINTAINER  Sascha Veres <sascha.veres@t-systems.com>
+FROM    ruby:alpine
+LABEL   maintainer="Sascha Veres <sascha.veres@t-systems.com>"
 
 ARG INSPEC_VERSION=3.0.46
 ARG GEM_SOURCE=https://rubygems.org

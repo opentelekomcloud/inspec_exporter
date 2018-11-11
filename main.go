@@ -92,15 +92,18 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		collector := collector{target: target, module: &m}
 		registry.MustRegister(collector)
 	} else {
-		profiles, err := ioutil.ReadDir("./")
+		if _, err := os.Stat(globalPath + "/"); os.IsNotExist(err) {
+			http.Error(w, fmt.Sprintf("Profule path '%s'", module), 400)
+			inspecRequestErrors.Inc()
+			return
+		}
+		profiles, err := ioutil.ReadDir(globalPath + "/")
 		if err != nil {
 			http.Error(w, "'profile_path' is not readable", 500)
 			inspecRequestErrors.Inc()
 			return
 		}
-
 		for _, profile := range profiles {
-
 			//TODO: use defaults
 			if viper.GetStringMap(profile.Name()) == nil {
 				m = Module{
@@ -122,7 +125,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 			collector := collector{target: target, module: &m}
-			registry.MustRegister(collector)
+			registry.Register(collector)
 		}
 	}
 
@@ -160,8 +163,7 @@ func main() {
 		fmt.Println("Config file changed:", e.Name)
 	})
 
-	http.Handle("/metrics", promhttp.Handler()) // Normal metrics endpoint for inspec exporter itself.
-	http.HandleFunc("/inspec", handler)         // Endpoint to do inspec scrapes.
+	http.HandleFunc("/metrics", handler)
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`<html>
@@ -182,7 +184,7 @@ func main() {
             </head>
             <body>
             	<h1>Inspec Exporter</h1>
-            	<form action="/inspec">
+            	<form action="/metrics">
             		<label>Target:</label> <input type="text" name="target" placeholder="X.X.X.X" value=""><br>
             		<label>Module:</label> <input type="text" name="module" placeholder="module" value="linux-baseline"><br>
             		<input type="submit" value="Submit">
