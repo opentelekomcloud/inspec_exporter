@@ -20,6 +20,7 @@ type collector struct {
 	module *Module
 }
 
+// Module config struct
 type Module struct {
 	sshUser         string
 	sshIdentityFile string
@@ -29,6 +30,7 @@ type Module struct {
 	prefix          string
 }
 
+//InspecOutput Inspec json-min reporter response struct
 type InspecOutput struct {
 	Controls []struct {
 		ID            string `json:"id"`
@@ -46,6 +48,7 @@ type InspecOutput struct {
 	Version string `json:"version"`
 }
 
+// ScrapeTarget implements Prometheus.Collector.
 func ScrapeTarget(target string, config *Module) (InspecOutput, error) {
 	inspecArgs := []string{
 		"exec",
@@ -103,20 +106,32 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 		float64(len(inspecData.Controls)))
 
 	passed := 0
+	duplicate := 0
+	descs := []string{}
 	for _, check := range inspecData.Controls {
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc(c.module.prefix+normalize(check.CodeDesc), normalize(check.CodeDesc), nil, nil),
-			prometheus.GaugeValue,
-			isPassed(check.Status))
-		if isPassed(check.Status) > 0 {
-			passed++
+		if include(descs, normalize(check.CodeDesc)) == false {
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc(c.module.prefix+normalize(check.CodeDesc), check.CodeDesc, nil, nil),
+				prometheus.GaugeValue,
+				isPassed(check.Status))
+			if isPassed(check.Status) > 0 {
+				passed++
+			}
+			descs = append(descs, normalize(check.CodeDesc))
+		} else {
+			duplicate++
 		}
 	}
 
 	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc(c.module.prefix+"total_passed", " Total number of passed inspec tests returned from scrape process.", nil, nil),
+		prometheus.NewDesc(c.module.prefix+"total_passed", "Total number of passed inspec tests returned from scrape process.", nil, nil),
 		prometheus.GaugeValue,
 		float64(passed))
+
+	ch <- prometheus.MustNewConstMetric(
+		prometheus.NewDesc(c.module.prefix+"duplicates", "Total number of duplicate inspec tests returned from scrape process.", nil, nil),
+		prometheus.GaugeValue,
+		float64(duplicate))
 
 	ch <- prometheus.MustNewConstMetric(
 		prometheus.NewDesc("inspec_scrape_duration_seconds", "Time inspec took.", nil, nil),
@@ -124,15 +139,29 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 		float64(time.Since(start).Seconds()))
 }
 
+func index(vs []string, t string) int {
+	for i, v := range vs {
+		if v == t {
+			return i
+		}
+	}
+	return -1
+}
+
+func include(vs []string, t string) bool {
+	return index(vs, t) >= 0
+}
+
 func normalize(desc string) string {
 	return strings.Replace(
-		sanitize.Name(strings.Replace(desc, "/", "_", -1)), "-", "_", -1)
+		strings.Replace(
+			strings.Replace(
+				sanitize.Name(strings.Replace(desc, "/", "_", -1)), "-", "_", -1), "_.", "_dot", -1), ".", "_", -1)
 }
 
 func isPassed(passed string) float64 {
 	if passed == "passed" {
 		return float64(1)
-	} else {
-		return float64(0)
 	}
+	return float64(0)
 }

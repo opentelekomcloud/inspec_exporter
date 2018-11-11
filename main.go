@@ -50,8 +50,8 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	target := r.URL.Query().Get("target")
 	module := r.URL.Query().Get("module")
 
-	global_path := viper.GetString("profile_path")
-	if _, err := os.Stat(global_path); os.IsNotExist(err) {
+	globalPath := viper.GetString("profile_path")
+	if _, err := os.Stat(globalPath); os.IsNotExist(err) {
 		// path/to/whatever does not exist
 		http.Error(w, "'profile_path' in config is empty or does not exists", 500)
 		inspecRequestErrors.Inc()
@@ -63,7 +63,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 	m := Module{}
 	if module != "" {
-		if _, err := os.Stat(global_path + "/" + module); os.IsNotExist(err) {
+		if _, err := os.Stat(globalPath + "/" + module); os.IsNotExist(err) {
 			http.Error(w, fmt.Sprintf("Unkown module '%s'", module), 400)
 			inspecRequestErrors.Inc()
 			return
@@ -72,7 +72,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		//TODO: use defaults
 		if viper.GetStringMap(module) == nil {
 			m = Module{
-				path:            global_path + "/" + module,
+				path:            globalPath + "/" + module,
 				needSudo:        false,
 				prefix:          "inspec_" + module + "_",
 				sshIdentityFile: "",
@@ -104,7 +104,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			//TODO: use defaults
 			if viper.GetStringMap(profile.Name()) == nil {
 				m = Module{
-					path:            global_path + "/" + profile.Name(),
+					path:            globalPath + "/" + profile.Name(),
 					needSudo:        false,
 					prefix:          "inspec_" + profile.Name() + "_",
 					sshIdentityFile: "",
@@ -112,7 +112,6 @@ func handler(w http.ResponseWriter, r *http.Request) {
 					sshUser:         "",
 				}
 			} else {
-
 				m = Module{
 					path:            viper.GetString(fmt.Sprintf("%v.path", profile.Name())),
 					needSudo:        viper.GetBool(fmt.Sprintf("%v.need_sudo", profile.Name())),
@@ -150,7 +149,7 @@ func main() {
 	viper.AddConfigPath("$HOME/.inspec_exporter") // call multiple times to add many search paths
 	err := viper.ReadInConfig()                   // Find and read the config file
 	if err != nil {                               // Handle errors reading the config file
-		panic(fmt.Errorf("Fatal error config file: %s \n", err))
+		panic(fmt.Errorf("fatal error config file: %s", err))
 	}
 	_, inspecLookErr := exec.LookPath(viper.GetString("inspec_path"))
 	if inspecLookErr != nil {
@@ -182,9 +181,9 @@ func main() {
             </style>
             </head>
             <body>
-            	<h1>inspec Exporter</h1>
+            	<h1>Inspec Exporter</h1>
             	<form action="/inspec">
-            		<label>Target:</label> <input type="text" name="target" placeholder="X.X.X.X" value="1.2.3.4"><br>
+            		<label>Target:</label> <input type="text" name="target" placeholder="X.X.X.X" value=""><br>
             		<label>Module:</label> <input type="text" name="module" placeholder="module" value="linux-baseline"><br>
             		<input type="submit" value="Submit">
             	</form>
