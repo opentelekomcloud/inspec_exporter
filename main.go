@@ -8,19 +8,20 @@ import (
 
 	"gopkg.in/alecthomas/kingpin.v2"
 
+	"io/ioutil"
+	"os"
+	"os/exec"
+
 	"github.com/fsnotify/fsnotify"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/common/log"
 	"github.com/prometheus/common/version"
 	"github.com/spf13/viper"
-	"io/ioutil"
-	"os"
-	"os/exec"
 )
 
 var (
-	configFile    = kingpin.Flag("config.file", "Path to configuration file.").Default("inspec").String()
+	configFile    = kingpin.Flag("config.file", "Filename to configuration file, without extention (DEFAULT: inspec)").Default("inspec").String()
 	listenAddress = kingpin.Flag("web.listen-address", "Address to listen on for web interface and telemetry.").Default(":9124").String()
 
 	// Metrics about the inspec exporter itself.
@@ -184,7 +185,7 @@ func main() {
             	<h1>inspec Exporter</h1>
             	<form action="/inspec">
             		<label>Target:</label> <input type="text" name="target" placeholder="X.X.X.X" value="1.2.3.4"><br>
-            		<label>Module:</label> <input type="text" name="module" placeholder="module" value="sudoers"><br>
+            		<label>Module:</label> <input type="text" name="module" placeholder="module" value="linux-baseline"><br>
             		<input type="submit" value="Submit">
             	</form>
 				<p><a href="/metrics">Metrics</a></p>

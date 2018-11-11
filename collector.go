@@ -9,9 +9,10 @@ import (
 	"github.com/prometheus/common/log"
 
 	"encoding/json"
-	"github.com/spf13/viper"
 	"os/exec"
 	"strings"
+
+	"github.com/spf13/viper"
 )
 
 type collector struct {
@@ -56,9 +57,10 @@ func ScrapeTarget(target string, config *Module) (InspecOutput, error) {
 			fmt.Sprintf("ssh://%v@%v:%v", config.sshUser, target, config.sshPort),
 			"-i",
 			config.sshIdentityFile)
-	}
-	if config.needSudo {
-		inspecArgs = append(inspecArgs, "--sudo")
+
+		if config.needSudo {
+			inspecArgs = append(inspecArgs, "--sudo")
+		}
 	}
 
 	var inspecData InspecOutput
