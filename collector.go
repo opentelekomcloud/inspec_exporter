@@ -37,6 +37,8 @@ type InspecOutput struct {
 		Status        string `json:"status"`
 		CodeDesc      string `json:"code_desc"`
 		Message       string `json:"message,omitempty"`
+		SkipMessage   string `json:"skip_message,omitempty"`
+		Resource      string `json:"resource,omitempty"`
 	} `json:"controls"`
 	Statistics struct {
 		Duration float64 `json:"duration"`
@@ -102,7 +104,7 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 
 	for _, check := range inspecData.Controls {
 		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc(strings.Replace(sanitize.BaseName(sanitize.Name(check.CodeDesc)), "-", "_", -1), check.CodeDesc, nil, nil),
+			prometheus.NewDesc(normalize(check.CodeDesc), check.CodeDesc, nil, nil),
 			prometheus.GaugeValue,
 			isPassed(check.Status))
 	}
@@ -111,6 +113,14 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 		prometheus.NewDesc("inspec_scrape_duration_seconds", "Time inspec took.", nil, nil),
 		prometheus.GaugeValue,
 		float64(time.Since(start).Seconds()))
+}
+
+func normalize(desc string) string {
+	return strings.Replace(
+		sanitize.BaseName(
+			sanitize.Name(
+				sanitize.Path(
+					sanitize.Accents(desc)))), "-", "_", -1)
 }
 
 func isPassed(passed string) float64 {
