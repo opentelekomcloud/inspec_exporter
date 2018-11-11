@@ -15,7 +15,6 @@ EXPOSE      9124
 ENTRYPOINT  [ "/bin/inspec_exporter" ]
 CMD         [ "--config.file=inspec" ]
 
-VOLUME ["/inspec.yml"]
 VOLUME ["/profiles"]
 
-WORKDIR /etc/inspec_exporter/profiles
+WORKDIR /profiles

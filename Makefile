@@ -25,14 +25,14 @@ build: dep promu
 	@$(DEP) ensure
 	@$(PROMU) build --prefix $(PREFIX)
 
-crossbuild: promu
+crossbuild: dep promu
 	@echo ">> crossbuild binaries"
 	@$(PROMU) crossbuild
 	@$(PROMU) corssbuild tarball --prefix $(PREFIX) $(BIN_DIR)
 	@$(PROMU) corssbuild checksums .tarballs
 	@$(PROMU) corssbuild release .tarballs
 
-docker:
+docker: build
 	@echo ">> building docker image"
 	@docker build -t "$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG)" .
 

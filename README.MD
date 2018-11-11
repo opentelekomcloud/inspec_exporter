@@ -30,7 +30,8 @@ To see all available configuration flags:
 
 ## Using Docker
 
-TBD
+    make docker
+    docker run --name inspec_exporter -p 9124:9124 -v /srv/insepc:/profiles:ro -v /etc/inspec_exporter/inspec.yml:/etc/inspec_exporter/inspec.yml:ro -d inspec_exporter:master
 
 ## Inspec Config
 
