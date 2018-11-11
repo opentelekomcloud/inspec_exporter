@@ -104,7 +104,7 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 
 	for _, check := range inspecData.Controls {
 		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc(normalize(check.CodeDesc), check.CodeDesc, nil, nil),
+			prometheus.NewDesc(c.module.prefix+normalize(check.CodeDesc), check.CodeDesc, nil, nil),
 			prometheus.GaugeValue,
 			isPassed(check.Status))
 	}
