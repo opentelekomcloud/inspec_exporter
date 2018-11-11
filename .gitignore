@@ -29,7 +29,6 @@ dependencies-stamp
 .deps
 *.tar.gz
 .DS_Store
-vendor/
 inspec.yml
 
 generator/generator
