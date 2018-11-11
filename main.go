@@ -74,7 +74,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			m = Module{
 				path:            global_path + "/" + module,
 				needSudo:        false,
-				prefix:          "inspec_" + module,
+				prefix:          "inspec_" + module + "_",
 				sshIdentityFile: "",
 				sshPort:         0,
 				sshUser:         "",
@@ -83,7 +83,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			m = Module{
 				path:            viper.GetString(fmt.Sprintf("%v.path", module)),
 				needSudo:        viper.GetBool(fmt.Sprintf("%v.need_sudo", module)),
-				prefix:          "inspec_" + viper.GetString(fmt.Sprintf("%v.prefix", module)),
+				prefix:          "inspec_" + viper.GetString(fmt.Sprintf("%v.prefix", module)) + "_",
 				sshIdentityFile: viper.GetString(fmt.Sprintf("%v.ssh_identity_file", module)),
 				sshPort:         viper.GetInt(fmt.Sprintf("%v.ssh_port", module)),
 				sshUser:         viper.GetString(fmt.Sprintf("%v.ssh_user", module)),
@@ -106,7 +106,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 				m = Module{
 					path:            global_path + "/" + profile.Name(),
 					needSudo:        false,
-					prefix:          "inspec_" + profile.Name(),
+					prefix:          "inspec_" + profile.Name() + "_",
 					sshIdentityFile: "",
 					sshPort:         0,
 					sshUser:         "",
@@ -116,7 +116,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 				m = Module{
 					path:            viper.GetString(fmt.Sprintf("%v.path", profile.Name())),
 					needSudo:        viper.GetBool(fmt.Sprintf("%v.need_sudo", profile.Name())),
-					prefix:          "inspec_" + viper.GetString(fmt.Sprintf("%v.prefix", profile.Name())),
+					prefix:          "inspec_" + viper.GetString(fmt.Sprintf("%v.prefix", profile.Name())) + "_",
 					sshIdentityFile: viper.GetString(fmt.Sprintf("%v.ssh_identity_file", profile.Name())),
 					sshPort:         viper.GetInt(fmt.Sprintf("%v.ssh_port", profile.Name())),
 					sshUser:         viper.GetString(fmt.Sprintf("%v.ssh_user", profile.Name())),
