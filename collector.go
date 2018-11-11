@@ -117,10 +117,7 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 
 func normalize(desc string) string {
 	return strings.Replace(
-		sanitize.BaseName(
-			sanitize.Name(
-				sanitize.Path(
-					sanitize.Accents(desc)))), "-", "_", -1)
+		sanitize.Name(strings.Replace(desc, "/", "_", -1)), "-", "_", -1)
 }
 
 func isPassed(passed string) float64 {
