@@ -33,9 +33,15 @@ To see all available configuration flags:
     make docker
     docker run --name inspec_exporter -p 9124:9124 -v /srv/insepc:/profiles:ro -v /etc/inspec_exporter/inspec.yml:/etc/inspec_exporter/inspec.yml:ro -d inspec_exporter:master
 
-## Inspec Config
+## Prometheus Config
 
-TBD
+    - job_name: inspec_linux_baseline
+      scrape_interval: '5m'
+      scrape_timeout: '3m'
+      params:
+        module: ['linux-baseline']
+      static_configs:
+        - targets: ['localhost:9124']
 
 ## Remote exec
 
