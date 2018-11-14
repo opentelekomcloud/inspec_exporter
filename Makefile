@@ -20,9 +20,12 @@ format:
 	@echo ">> formatting code"
 	@$(GO) fmt $(pkgs)
 
-build: dep promu
-	@echo ">> building binaries"
+update: dep
+	@echo ">> update vendors"
 	@$(DEP) ensure
+
+build: promu
+	@echo ">> building binaries"
 	@$(PROMU) build --prefix $(PREFIX)
 
 crossbuild: dep promu
