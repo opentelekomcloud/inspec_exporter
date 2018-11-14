@@ -31,9 +31,9 @@ build: promu
 crossbuild: dep promu
 	@echo ">> crossbuild binaries"
 	@$(PROMU) crossbuild
-	@$(PROMU) corssbuild tarball --prefix $(PREFIX) $(BIN_DIR)
-	@$(PROMU) corssbuild checksums .tarballs
-	@$(PROMU) corssbuild release .tarballs
+	@$(PROMU) crossbuild tarballs
+	@$(PROMU) checksum .tarballs
+	@$(PROMU) release .tarballs
 
 docker: build
 	@echo ">> building docker image"
@@ -49,4 +49,4 @@ dep:
 	GOARCH=$(subst x86_64,amd64,$(patsubst i%86,386,$(shell uname -m))) \
 	$(GO) get -u github.com/golang/dep/cmd/dep
 
-.PHONY: all style format build crossbuild docker promu dep
+.PHONY: all style format update build crossbuild docker promu dep
